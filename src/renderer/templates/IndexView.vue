@@ -14,12 +14,11 @@
     margin-left: 15px;
     margin-right: 15px;
     overflow: hidden;
-    background: #fff;
-    border-radius: 4px;
+    padding: 0 0 0 0;
 }
 
 .layout-content-main {
-    padding: 20px 10px;
+    border-radius: 4px;
 }
 
 .layout-menu-left {
@@ -72,7 +71,7 @@
                 </div>
             </div>
             <div class="layout-right">
-            q
+                <user-info-bar></user-info-bar>
             </div>
         </Col>
     </Row>
@@ -84,12 +83,14 @@
 import HeaderBar from '@/assembly/HeaderBar'
 import LeftBar from '@/assembly/LeftBar'
 import TitleBar from '@/assembly/TitleBar'
+import UserInfoBar from '@/assembly/UserInfoBar'
 
 export default {
     components:{
         HeaderBar,
         LeftBar,
-        TitleBar
+        TitleBar,
+        UserInfoBar
     }
 }
 

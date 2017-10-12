@@ -14,10 +14,22 @@ export default new Router({
       path: '/index',
       name: 'index-view',
       component: require('@/templates/IndexView').default,
-      children: [{
+      children: [
+        {
           path: '',
-          component: require('@/templates/LoginView').default
-      }]
+          component: require('@/templates/FavouritesView').default,
+          children: [
+            {
+              path: '/file-index',
+              component: require('@/templates/Favourites/FileIndexView').default
+            },
+            {
+              path: '/file-upload',
+              component: require('@/templates/Favourites/UploadView').default
+            }
+          ]
+        }
+      ]
     },
     {
       path: '*',
