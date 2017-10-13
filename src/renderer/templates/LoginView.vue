@@ -54,7 +54,30 @@
         methods:{
             submitLogin() {
                 if(this.login.username.length != 0 && this.login.password.length != 0) { 
-                    this.$router.push({ path: '/index'})
+                    this.$http.get('/static/users.json').then(response => {
+                        // success callback
+                        console.log('submit success resp:' + response)
+
+                        var index;
+                        for(index in response.data) {
+                            if(response.data[index].username === this.login.username) {
+                                if(response.data[index].password === this.login.password) {
+                                    sessionStorage.setItem('username', this.login.username)
+                                    sessionStorage.setItem('password', this.login.password)
+                                    sessionStorage.setItem('bucketId', response.data[index].bucketId)
+
+                                    this.$router.push({ path: '/index'})
+                                } else {
+                                    alert('username or password error!')
+                                }
+                            } else {
+                                alert('username not exist!')
+                            }
+                        }
+                    }, response => {
+                        // error callback
+                        console.log('submit error resp:' + response)
+                    });
                 }
             }
         }

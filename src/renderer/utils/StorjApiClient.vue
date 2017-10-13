@@ -1,13 +1,8 @@
 <script type="text/javascript">
+import iView from 'iview';
 
 const {Environment} = require('storj');
-const storj = new Environment({
-    bridgeUrl: 'https://api.storj.io',
-    bridgeUser: 'gencodettt@gmail.com',
-    bridgePass: 'lab@12345',
-    encryptionKey: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about',
-    logLevel: 0
-});
+const storjApiUrl = 'https://api.storj.io';
 
 /* 创建Bucket */
 function createBucket(bucketName) {
@@ -53,9 +48,42 @@ function deleteBucket(bucketName) {
     });
 }
 
+/* 上传文件 */
+function uploadFile(file, bucketId, bridgeUser, bridgePass) {
+    var _storj = getStorj(bridgeUser, bridgePass);
+    _storj.storeFile(bucketId, file.path, {
+        filename: file.name,
+        progressCallback: function (progress, uploadedBytes, totalBytes) {
+            console.log('Progress: %d, uploadedBytes: %d, totalBytes: %d', progress, uploadedBytes, totalBytes);
+        },
+        finishedCallback: function (err, fileId) {
+            if(err) {
+                return console.error('upload-file error: ' + err + ' filename=' + file.name);
+            }
+            console.log('File upload complete:', fileId);
+            iView.Notice.success({
+                title: '<b>File: ' + file.name + ' Upload Success</b>'
+            });
+        }
+    });
+}
+
+/* 获取Storj连接 */
+function getStorj(bridgeUser, bridgePass) {
+    var _storj = new Environment({
+        bridgeUrl: storjApiUrl,
+        bridgeUser: bridgeUser,
+        bridgePass: bridgePass,
+        encryptionKey: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about',
+        logLevel: 0
+    });
+    return _storj;
+}
+
 export default {
     createBucket,
     getBuckets,
-    deleteBucket
+    deleteBucket,
+    uploadFile
 }
 </script>
