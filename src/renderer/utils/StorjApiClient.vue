@@ -58,11 +58,18 @@ function uploadFile(file, bucketId, bridgeUser, bridgePass) {
         },
         finishedCallback: function (err, fileId) {
             if(err) {
+                iView.Notice.error({
+                title: '<b>File Upload Error</b>',
+                desc: file.path + ' , ' + err,
+                duration: 0
+            });
                 return console.error('upload-file error: ' + err + ' filename=' + file.name);
             }
             console.log('File upload complete:', fileId);
             iView.Notice.success({
-                title: '<b>File: ' + file.name + ' Upload Success</b>'
+                title: '<b>File Upload Success</b>',
+                desc: file.path,
+                duration: 0
             });
         }
     });

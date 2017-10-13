@@ -18,7 +18,7 @@
 </style>
 
 <template>
-    <Menu :active-name="setActive" theme="primary" width="auto" @on-select="routeTo">
+    <Menu active-name="index" theme="primary" width="auto" @on-select="routeTo">
         <div class="layout-logo-left"><img id="logo" src="~@/assets/logo_small.png"></div>
             <MenuItem name="index">
                 <Icon type="ios-navigate" :size="iconSize"></Icon>
