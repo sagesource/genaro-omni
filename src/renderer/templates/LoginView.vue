@@ -22,7 +22,7 @@
                         <Button type="ghost" style="margin-left: 8px">Sign Up</Button>
                     </FormItem>
                 </div>
-                <a id="a_forget">Forget Password?</a>
+                <a id="a_forget">Redister Now!</a>
             </Form>
         </Card>
     </div>
@@ -62,9 +62,9 @@
                         for(index in response.data) {
                             if(response.data[index].username === this.login.username) {
                                 if(response.data[index].password === this.login.password) {
-                                    sessionStorage.setItem('username', this.login.username)
-                                    sessionStorage.setItem('password', this.login.password)
-                                    sessionStorage.setItem('bucketId', response.data[index].bucketId)
+                                    this.$store.commit('updateUsername', this.login.username)
+                                    this.$store.commit('updatePassword', this.login.password)
+                                    this.$store.commit('updateBucketId', response.data[index].bucketId)
 
                                     this.$router.push({ path: '/index'})
                                 } else {

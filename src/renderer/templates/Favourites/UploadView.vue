@@ -41,15 +41,15 @@
     <div>
         <Card :bordered="false" dis-hover>
             <p slot="title">
-                <Icon type="android-arrow-up" size="20"></Icon>Upload</p>
+                <Icon type="android-arrow-up" size="20" style="margin-right:20px"></Icon>Upload</p>
             <Row>
                 <Col span="24"> Upload to
                 <Dropdown>
                     <a href="javascript:void(0)">北京小吃<Icon type="arrow-down-b"></Icon></a>
                     <DropdownMenu slot="list">
-                        <DropdownItem>驴打滚</DropdownItem>
-                        <DropdownItem>炸酱面</DropdownItem>
-                        <DropdownItem>豆汁儿</DropdownItem>
+                        <DropdownItem>6cdbedc09a79ee22ad173031</DropdownItem>
+                        <DropdownItem>6cdbedc09a79ee22ad173031</DropdownItem>
+                        <DropdownItem>6cdbedc09a79ee22ad173031</DropdownItem>
                     </DropdownMenu>
                 </Dropdown>
                 </Col>
@@ -91,6 +91,7 @@
 
 <script>
     import STROJ_CLIENT from '../../utils/StorjApiClient'
+
     export default {
         data() {
             return {
@@ -105,7 +106,21 @@
                 ],
                 imgName: '',
                 visible: false,
-                uploadList: []
+                uploadList: [],
+                bucketIds : [
+                    sessionStorage.getItem('bucketId')
+                ],
+            }
+        },
+        computed: {
+            username() {
+                return this.$store.state.User.username
+            },
+            password() {
+                return this.$store.state.User.password
+            },
+            bucketId() {
+                return this.$store.state.User.bucketId
             }
         },
         methods: {
@@ -143,9 +158,9 @@
                         title: '最多只能上传 5 个文件。'
                     });
                 } else {
-                    var username = sessionStorage.getItem('username')
-                    var password = sessionStorage.getItem('password')
-                    var bucketId = sessionStorage.getItem('bucketId')
+                    var username = this.username
+                    var password = this.password
+                    var bucketId = this.bucketId
                     STROJ_CLIENT.uploadFile(file, bucketId, username, password)
                 }
                 return check;

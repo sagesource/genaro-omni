@@ -8,7 +8,7 @@
 }
 .layout-user-processor {
     padding-left: 60px;
-    padding-right: 40px;
+    padding-right: 10px;
 }
 .layout-user-wallet {
     margin-top: 25px;
@@ -28,7 +28,7 @@
                 </Col>
                 <Col span="23">
                     <div class="layout-user-processor">
-                        <span style="float:right">Larry Liu</span>
+                        <span style="float:right">{{ username }}</span>
                         <Progress :percent="45"  status="active" hide-info :stroke-width="3" style="width:120px"></Progress>
                         <span>8.00GB/40.00GB</span>
                     </div>
@@ -56,5 +56,10 @@
 
 <script>
     export default {
+        computed: {
+            username() {
+                return this.$store.state.User.username
+            }
+        },
     }
 </script>

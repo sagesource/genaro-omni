@@ -32,6 +32,11 @@ export default new Router({
       ]
     },
     {
+      path: '/register',
+      name: 'register-view',
+      component: require('@/templates/RegisterView').default
+    },
+    {
       path: '*',
       redirect: '/'
     }

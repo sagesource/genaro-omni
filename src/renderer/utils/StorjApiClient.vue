@@ -1,5 +1,6 @@
 <script type="text/javascript">
 import iView from 'iview';
+import store from '../store'
 
 const {Environment} = require('storj');
 const storjApiUrl = 'https://api.storj.io';
