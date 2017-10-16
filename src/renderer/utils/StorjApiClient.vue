@@ -51,11 +51,12 @@ function getBucketList(bridgeUser, bridgePass, errorCallback, successCallback) {
 }
 
 /* 上传文件 */
-function uploadFile(file, bucketId, bridgeUser, bridgePass, errorCallback, successCallback) {
+function uploadFile(file, bucketId, bridgeUser, bridgePass, errorCallback, successCallback, progressCallback) {
     var _storj = getStorj(bridgeUser, bridgePass);
     _storj.storeFile(bucketId, file.path, {
         filename: file.name,
         progressCallback: function (progress, uploadedBytes, totalBytes) {
+            progressCallback(progress, uploadedBytes, totalBytes)
             console.log('Progress: %d, uploadedBytes: %d, totalBytes: %d', progress, uploadedBytes, totalBytes);
         },
         finishedCallback: function (err, fileId) {

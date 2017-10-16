@@ -23,7 +23,7 @@
             <MenuItem name="index">
                 <Icon type="ios-navigate" :size="iconSize"></Icon>
             </MenuItem>
-            <MenuItem name="form">
+            <!-- <MenuItem name="form">
                 <Icon type="document" :size="iconSize"></Icon>
             </MenuItem>
             <MenuItem name="table">
@@ -46,7 +46,7 @@
             </MenuItem>
             <MenuItem name="echarts">
                 <Icon type="pie-graph" :size="iconSize"></Icon>
-            </MenuItem>
+            </MenuItem> -->
             <div class="fill_bar"></div>
     </Menu>
 </template>

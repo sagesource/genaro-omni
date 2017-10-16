@@ -55,25 +55,12 @@
                 </Col>
             </Row>
             <Row>
-                <div class="demo-upload-list" v-for="item in uploadList">
-                    <template v-if="item.status === 'finished'">
-                        <img :src="item.url">
-                        <div class="demo-upload-list-cover">
-                            <Icon type="ios-eye-outline" @click.native="handleView(item.name)"></Icon>
-                            <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
-                        </div>
-                    </template>
-                    <template v-else>
-                        <Progress v-if="item.showProgress" :percent="item.percentage" hide-info></Progress>
-                    </template>
-                </div>
                 <Upload
                     ref="upload"
                     :show-upload-list="false"
                     :max-size="4096"
                     :on-exceeded-size="handleMaxSize"
                     :before-upload="handleBeforeUpload"
-                    multiple
                     type="drag"
                     action=""
                     style="display: inline-block;width:260px;">
@@ -84,23 +71,11 @@
                 </Upload>
             </Row>
             <Row>
-            <template>
+            <template v-if="uploadEnd === false">
                 <Card :bordered="false">
                     <p slot="title">Upload Schedule</p>
                     <Row>
-                        aaaa:<Progress :percent="45" status="active"></Progress>
-                    </Row>
-                    <Row>
-                        bbbb:<Progress :percent="45" status="active"></Progress>
-                    </Row>
-                    <Row>
-                        cccc:<Progress :percent="45" status="active"></Progress>
-                    </Row>
-                    <Row>
-                        dddd:<Progress :percent="45" status="active"></Progress>
-                    </Row>
-                    <Row>
-                        eeee:<Progress :percent="45" status="active"></Progress>
+                        <Progress :percent="uploadedBytes/totalBytes*100" status="active"></Progress>
                     </Row>
                 </Card>
             </template>
@@ -117,18 +92,6 @@
     export default {
         data() {
             return {
-                defaultList: [{
-                        'name': 'a42bdcc1178e62b4694c830f028db5c0',
-                        'url': 'https://o5wwk8baw.qnssl.com/a42bdcc1178e62b4694c830f028db5c0/avatar'
-                    },
-                    {
-                        'name': 'bc7521e033abdd1e92222d733590f104',
-                        'url': 'https://o5wwk8baw.qnssl.com/bc7521e033abdd1e92222d733590f104/avatar'
-                    }
-                ],
-                imgName: '',
-                visible: false,
-                uploadList: [],
                 bucketName: null,
                 bucketId: null
             }
@@ -153,13 +116,18 @@
             },
             bucketList() {
                 return this.$store.state.User.bucketList
+            },
+            totalBytes() {
+                return this.$store.state.File.totalBytes
+            },
+            uploadedBytes() {
+                return this.$store.state.File.uploadedBytes
+            },
+            uploadEnd() {
+                return this.$store.state.File.uploadEnd
             }
         },
         methods: {
-            handleView(name) {
-                this.imgName = name;
-                this.visible = true;
-            },
             handleRemove(file) {
                 // 从 upload 实例删除数据
                 const fileList = this.$refs.upload.fileList;
@@ -173,41 +141,40 @@
             },
             handleBeforeUpload(file) {
                 console.log("upload-file: " + file.path);
-                const check = this.uploadList.length < 5;
                 const bucketCheck = this.bucketName != null && this.bucketId != null
                 if(!bucketCheck) {
                     this.$Notice.warning({
                         title: 'Please Choose Bucket Name!'
                     });
-                } else if (!check) {
-                    this.$Notice.warning({
-                        title: 'You can upload up to 5 files at most.'
-                    });
                 } else {
                     var uploadBucketName = this.bucketName;
+                    // 更新文件总大小
+                    this.$store.commit('updateTotalBytes', file.size)
+
                     STROJ_CLIENT.uploadFile(file, this.bucketId, this.username, this.password, function(err) {
                         iView.Notice.error({
                             title: '<b>File Upload Error</b>',
                             desc: 'File: ' + file.path + '<br>Bucket:' + uploadBucketName + '<br>Error:' + err,
                             duration: 0
                         });
+                        store.commit('updateUploadEnd', true)
                     }, function() {
                         iView.Notice.success({
                             title: '<b>File Upload Success</b>',
                             desc: 'File: ' + file.path + ' <br>Bucket: ' + uploadBucketName,
                             duration: 0
                         });
+                        store.commit('updateUploadEnd', true)
+                    }, function(progress, uploadedBytes, totalBytes) {
+                        store.commit('updateUploadedBytes', uploadedBytes)
+                        store.commit('updateUploadEnd', false)
                     })
                 }
-                return check;
             },
             bucketSelect(bucket) {
                 this.bucketName = bucket.name
                 this.bucketId = bucket.id
             }
-        },
-        mounted() {
-            this.uploadList = this.$refs.upload.fileList;
         }
     }
 </script>
