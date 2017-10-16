@@ -16,17 +16,6 @@ function createBucket(bucketName) {
     });
 }
 
-/* 获取Buckets */
-function getBuckets() {
-    storj.getBuckets(function (err, result) {
-        if(err) {
-            console.error('get-buckets error: ' + err);
-        } else {
-            console.log('get-buckets: ' + result);
-        }
-    });
-}
-
 /* 删除Bucket */
 function deleteBucket(bucketName) {
     storj.getBuckets(function (err, result) {
@@ -49,8 +38,20 @@ function deleteBucket(bucketName) {
     });
 }
 
+/* 获取bucket列表 */
+function getBucketList(bridgeUser, bridgePass, errorCallback, successCallback) {
+    var _storj = getStorj(bridgeUser, bridgePass);
+    _storj.getBuckets(function (err, result) {
+        if(err) {
+            errorCallback(err)
+        } else {
+            successCallback(result)
+        }
+    });
+}
+
 /* 上传文件 */
-function uploadFile(file, bucketId, bridgeUser, bridgePass) {
+function uploadFile(file, bucketId, bridgeUser, bridgePass, errorCallback, successCallback) {
     var _storj = getStorj(bridgeUser, bridgePass);
     _storj.storeFile(bucketId, file.path, {
         filename: file.name,
@@ -59,19 +60,11 @@ function uploadFile(file, bucketId, bridgeUser, bridgePass) {
         },
         finishedCallback: function (err, fileId) {
             if(err) {
-                iView.Notice.error({
-                title: '<b>File Upload Error</b>',
-                desc: file.path + ' , ' + err,
-                duration: 0
-            });
+                errorCallback(err)
                 return console.error('upload-file error: ' + err + ' filename=' + file.name);
             }
             console.log('File upload complete:', fileId);
-            iView.Notice.success({
-                title: '<b>File Upload Success</b>',
-                desc: file.path,
-                duration: 0
-            });
+            successCallback()
         }
     });
 }
@@ -90,7 +83,7 @@ function getStorj(bridgeUser, bridgePass) {
 
 export default {
     createBucket,
-    getBuckets,
+    getBucketList,
     deleteBucket,
     uploadFile
 }
