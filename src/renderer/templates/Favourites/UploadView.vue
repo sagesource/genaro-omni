@@ -71,14 +71,12 @@
                 </Upload>
             </Row>
             <Row>
-            <template v-if="uploadEnd === false">
-                <Card :bordered="false">
-                    <p slot="title">Upload Schedule</p>
-                    <Row>
-                        <Progress :percent="uploadedBytes/totalBytes*100" status="active"></Progress>
-                    </Row>
-                </Card>
-            </template>
+                <template v-if="uploadList.length > 0">
+                    <Card :bordered="false">
+                        <p slot="title">Upload List</p>
+                        <Table height="200" :columns="tableColums" :data="uploadList"></Table>
+                    </Card>
+                </template>
             </Row>
         </Card>
     </div>
@@ -93,7 +91,15 @@
         data() {
             return {
                 bucketName: null,
-                bucketId: null
+                bucketId: null,
+                tableColums:[{
+                    title: 'File Name',
+                    key: 'filename'
+                },
+                {
+                    title: 'Bucket Name',
+                    key: 'bucket'
+                }]
             }
         },
         created: function () {
@@ -117,14 +123,8 @@
             bucketList() {
                 return this.$store.state.User.bucketList
             },
-            totalBytes() {
-                return this.$store.state.File.totalBytes
-            },
-            uploadedBytes() {
-                return this.$store.state.File.uploadedBytes
-            },
-            uploadEnd() {
-                return this.$store.state.File.uploadEnd
+            uploadList() {
+                return this.$store.state.Upload.uploadList
             }
         },
         methods: {
@@ -148,8 +148,6 @@
                     });
                 } else {
                     var uploadBucketName = this.bucketName;
-                    // 更新文件总大小
-                    this.$store.commit('updateTotalBytes', file.size)
 
                     STROJ_CLIENT.uploadFile(file, this.bucketId, this.username, this.password, function(err) {
                         iView.Notice.error({
@@ -157,17 +155,15 @@
                             desc: 'File: ' + file.path + '<br>Bucket:' + uploadBucketName + '<br>Error:' + err,
                             duration: 0
                         });
-                        store.commit('updateUploadEnd', true)
                     }, function() {
                         iView.Notice.success({
                             title: '<b>File Upload Success</b>',
                             desc: 'File: ' + file.path + ' <br>Bucket: ' + uploadBucketName,
                             duration: 0
                         });
-                        store.commit('updateUploadEnd', true)
+
+                        store.commit('addFile', {filename: file.path, bucket: uploadBucketName})
                     }, function(progress, uploadedBytes, totalBytes) {
-                        store.commit('updateUploadedBytes', uploadedBytes)
-                        store.commit('updateUploadEnd', false)
                     })
                 }
             },
