@@ -48,7 +48,7 @@
                 <Modal 
                     v-model="add_bucket_modal" title="Add Bucket" 
                     @on-ok="addBucketOk" @on-cancel="addBucketCancel"
-                    ok-text="OK" cancel-text="Cancel">
+                    ok-text="OK" cancel-text="Cancel" :closable="false">
                     <Form :model="addBucketItem" :label-width="100">
                         <FormItem label="Bucket Name">
                             <Input v-model="addBucketItem.bucketName" placeholder="Input Bucket Name"></Input>
@@ -78,6 +78,24 @@
                         <Button type="error" size="large"  @click="deleteFile">Delete</Button>
                     </div>
                 </Modal>
+
+                <!-- 删除Bucket确认框-->
+                <Modal v-model="show_del_bucket_modal" ok-text="OK" cancel-text="Cancel" :closable="false">
+                    <div style="height:40px; margin-top: 20px">
+                        <Row>
+                            <Col span="8">
+                                <h4>Confrim Delete Bucket:</h4>
+                            </Col>
+                            <Col span="16">
+                                {{ selected.selectBucketName }}
+                            </Col>
+                        </Row>
+                    </div>
+                    <div slot="footer">
+                        <Button type="primary" size="large"  @click="show_del_bucket_modal = false">Cancel</Button>
+                        <Button type="error" size="large"  @click="deleteBucket">Delete</Button>
+                    </div>
+                </Modal>
             </template>
     </div>
 </template>
@@ -97,6 +115,7 @@
                 add_bucket_modal: false,
                 show_buckets_modal: false,
                 show_receipt_modal: false,
+                show_del_bucket_modal: false,
                 addBucketItem: {
                     bucketName: ''
                 },
@@ -138,6 +157,13 @@
                                 },
                                 style: {
                                     marginRight: '3px'
+                                },
+                                on: {
+                                    click:() => {
+                                        this.selected.selectFileName = params.row.filename
+                                        this.selected.selectFileId = params.row.id
+                                        this.downloadFile()
+                                    }
                                 }
                             }, 'Download'),
                             h('a', {
@@ -196,6 +222,8 @@
                     var bucketName = this.addBucketItem.bucketName
                     var user_name = this.username
                     var pass_word = this.password
+
+                    iView.Message.info('Add Bucket Waiting');
                     STROJ_CLIENT.createBucket(bucketName, user_name, pass_word,
                         function(err) {
                             iView.Notice.error({
@@ -265,7 +293,7 @@
                         }, function() {
                             downloadNoticeArgs['title'] = 'File Download Success'
                             IVIEW_UTIL.showSuccessNotice(downloadNoticeArgs)
-                            
+
                             store.commit('updateDownloadFileList', {
                                 filename: downSelect.selectFileName,
                                 filepath : filepath,
@@ -278,18 +306,25 @@
                 })
             },
             bucketAction(name) {
+                if (name === 'delete') {
+                    this.show_del_bucket_modal = true
+                }
+            },
+            deleteBucket() {
                 var bridgeUser = this.username
                 var bridgePass = this.password
-                if (name === 'delete') {
-                    STROJ_CLIENT.deleteBucket(this.selected.selectBucketId, bridgeUser, bridgePass, 
+
+                STROJ_CLIENT.deleteBucket(this.selected.selectBucketId, bridgeUser, bridgePass, 
                         function(err) {
 
                         }, function(result) {
                             // 页面初始化,获取bucketList
+                            iView.Message.info('Bucket Delete Success');
                             FILEINDEX_JS.initBucketList(bridgeUser, bridgePass)
                         }
-                    )
-                }
+                )
+
+                this.selected.selectBucketId = ''
             }
         }
     }
