@@ -18,7 +18,7 @@
     -webkit-app-region: drag;
     cursor: default;
     min-width: 450px;
-    background-color: #fdfdfd;
+    background: #f5f7f9;
     overflow: hidden;
   }
 </style>

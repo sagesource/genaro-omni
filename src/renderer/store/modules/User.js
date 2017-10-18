@@ -1,15 +1,13 @@
 const state = {
     username: 'gencodettt@gmail.com',
     password: 'lab@12345',
-    bucketId: '{bucketId}',
-    bucketList: []
+    bucketId: '{bucketId}'
 }
 
 const getters = {
     username: state=> state.username,
     password: state=> state.password,
-    bucketId: state=> state.bucketId,
-    bucketList: state=> state.bucketList
+    bucketId: state=> state.bucketId
 }
 
 const mutations = {
@@ -21,9 +19,6 @@ const mutations = {
     },
     updateBucketId(state, bucketId) {
         state.bucketId = bucketId
-    },
-    updateBucketList(state, bucketList) {
-        state.bucketList = bucketList
     }
 }
 

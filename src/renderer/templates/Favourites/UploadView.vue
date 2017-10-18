@@ -121,7 +121,7 @@
                 return this.$store.state.User.password
             },
             bucketList() {
-                return this.$store.state.User.bucketList
+                return this.$store.state.Bucket.bucketList
             },
             uploadList() {
                 return this.$store.state.Upload.uploadList

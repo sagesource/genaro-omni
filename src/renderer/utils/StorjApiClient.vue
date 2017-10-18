@@ -6,34 +6,15 @@ const {Environment} = require('storj');
 const storjApiUrl = 'https://api.storj.io';
 
 /* 创建Bucket */
-function createBucket(bucketName) {
-    storj.createBucket(bucketName, function(err, result) {
+function createBucket(bucketName, bridgeUser, bridgePass, errorCallback, successCallback) {
+    var _storj = getStorj(bridgeUser, bridgePass);
+    _storj.createBucket(bucketName, function(err, result) {
         if (err) {
+            errorCallback(err)
             console.error('create-bucket-info: ' + err);
         } else {
+            successCallback(result)
             console.log('create-bucket-info:', result);
-        }
-    });
-}
-
-/* 删除Bucket */
-function deleteBucket(bucketName) {
-    storj.getBuckets(function (err, result) {
-        if(err) {
-            console.error('delete-bucket-get error: ' + err);
-        } else {
-            var bucketIndex;
-            for (bucketIndex in result) {
-                if(result[bucketIndex].name === bucketName) {
-                    storj.deleteBucket(result[bucketIndex].id,function (err,result) {
-                        if(err){
-                            console.error('delete-bucket error: ' + err);
-                        } else {
-                            console.log('delete-bucket:',result);
-                        }
-                    });
-                }
-            }
         }
     });
 }
@@ -46,6 +27,20 @@ function getBucketList(bridgeUser, bridgePass, errorCallback, successCallback) {
             errorCallback(err)
         } else {
             successCallback(result)
+        }
+    });
+}
+
+/* 删除Bucket */
+function deleteBucket(bucketId, bridgeUser, bridgePass, errorCallback, successCallback) {
+    var _storj = getStorj(bridgeUser, bridgePass);
+    _storj.deleteBucket(bucketId,function (err,result) {
+        if(err){
+            errorCallback(err)
+            console.error('delete-bucket error: ' + err);
+        } else {
+            successCallback(result)
+            console.log('delete-bucket:',result);
         }
     });
 }
@@ -70,6 +65,38 @@ function uploadFile(file, bucketId, bridgeUser, bridgePass, errorCallback, succe
     });
 }
 
+/* 获取文件列表 */
+function getFileList(bucketId, bridgeUser, bridgePass, errorCallback, successCallback) {
+    var _storj = getStorj(bridgeUser, bridgePass);
+    _storj.listFiles(bucketId, function (err, result) {
+        if (err) {
+            errorCallback(err)
+            return console.error(err);
+        }
+        successCallback(result)
+        console.log('list-files:', result);
+    })
+}
+
+/* 下载文件 */
+function downloadFile(bucketId, fileId, downloadFilePath, bridgeUser, bridgePass, errorCallback, successCallback, progressCallback) {
+    var _storj = getStorj(bridgeUser, bridgePass);
+    _storj.resolveFile(bucketId, fileId, downloadFilePath, {
+        progressCallback: function (progress, downloadedBytes, totalBytes) {
+            progressCallback(progress, downloadedBytes, totalBytes)
+            console.log('Progress: %d, downloadedBytes: %d, totalBytes: %d', progress, downloadedBytes, totalBytes)
+        },
+        finishedCallback: function (err) {
+            if (err) {
+                errorCallback(err)
+                console.error(err);
+            }
+            console.log('File download complete');
+            successCallback()
+        }
+    })
+}
+
 /* 获取Storj连接 */
 function getStorj(bridgeUser, bridgePass) {
     var _storj = new Environment({
@@ -86,6 +113,9 @@ export default {
     createBucket,
     getBucketList,
     deleteBucket,
-    uploadFile
+    deleteBucket,
+    uploadFile,
+    getFileList,
+    downloadFile
 }
 </script>

@@ -26,6 +26,10 @@ export default new Router({
             {
               path: '/file-upload',
               component: require('@/templates/Favourites/UploadView').default
+            },
+            {
+              path: '/file-download',
+              component: require('@/templates/Favourites/DownloadView').default
             }
           ]
         }

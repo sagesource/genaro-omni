@@ -1,7 +1,7 @@
 <style scoped>
 
 .layout {
-    border: 1px solid #d7dde4;
+    /*border: 1px solid #d7dde4;*/
     background: #f5f7f9;
     position: relative;
     overflow: hidden;
@@ -23,6 +23,7 @@
 
 .layout-menu-left {
     background: #fff;
+    height:670px;
     /*min-width: 100px;*/
 }
 
@@ -36,7 +37,7 @@
 
 .layout-right {
     float: left;
-    min-height: 580px;
+    min-height: 600px;
     width: 210px;
     overflow: hidden;
     background: #fff;
