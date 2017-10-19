@@ -3,7 +3,8 @@ const state = {
     fileListLoading: true,
     fileQrCode: '',
     fileDownPath: '',
-    downloadFileList: []
+    downloadFileList: [],
+    fileDownloadFlag: true
 }
 
 const getters = {
@@ -11,7 +12,8 @@ const getters = {
     fileListLoading: state=> state.fileListLoading,
     fileQrCode: state=> state.fileQrCode,
     fileDownPath: state=> state.fileDownPath,
-    downloadFileList: state=> state.downloadFileList
+    downloadFileList: state=> state.downloadFileList,
+    fileDownloadFlag: state=> state.fileDownloadFlag
 }
 
 const mutations = {
@@ -29,6 +31,9 @@ const mutations = {
     },
     updateDownloadFileList(state, downloadFile) {
         state.downloadFileList.push(downloadFile)
+    },
+    updateFileDownloadFlag(state, fileDownloadFlag) {
+        state.fileDownloadFlag = fileDownloadFlag
     }
 }
 

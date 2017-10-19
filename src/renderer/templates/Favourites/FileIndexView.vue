@@ -74,8 +74,8 @@
                     </div>
                     <div slot="footer">
                         <input id="fileDialog" type="file" nwsaveas hidden/>
-                        <Button type="primary" size="large"  @click="downloadFile">Download</Button>
-                        <Button type="error" size="large"  @click="deleteFile">Delete</Button>
+                        <Button v-if="!fileDownloadFlag" type="primary" size="large"  @click="downloadFile">Download</Button>
+                        <Button v-if="!fileDownloadFlag" type="error" size="large"  @click="deleteFile">Delete</Button>
                     </div>
                 </Modal>
 
@@ -214,9 +214,13 @@
             },
             fileQrCode() {
                 return this.$store.state.File.fileQrCode
+            },
+            fileDownloadFlag() {
+                return this.$store.state.File.fileDownloadFlag
             }
         },
         methods: {
+            // 添加Bucket 确认按钮事件
             addBucketOk() {
                 if (this.addBucketItem.bucketName != '') {
                     var bucketName = this.addBucketItem.bucketName
@@ -224,6 +228,8 @@
                     var pass_word = this.password
 
                     iView.Message.info('Add Bucket Waiting');
+
+                    // 调用创建Bucket Api
                     STROJ_CLIENT.createBucket(bucketName, user_name, pass_word,
                         function(err) {
                             iView.Notice.error({
@@ -233,6 +239,8 @@
                             });
                         }, function(result) {
                             iView.Message.info('Add Bucket Success');
+
+                            // 添加完成后 刷新Bucket列表
                             FILEINDEX_JS.initBucketList(user_name, pass_word)
                         }
                     )
@@ -265,6 +273,14 @@
                 }, function(result) {
                     store.commit('updateFileQrCode', result)
                 })
+
+                // 检查文件是否已经下载
+                FILEINDEX_JS.checkFileDownload(this.selected.selectBucketId, this.selected.selectFileId, function(result) {
+                    if(result.length > 0)
+                        store.commit('updateFileDownloadFlag', true)
+                    else 
+                        store.commit('updateFileDownloadFlag', false)
+                })
             },
             deleteFile() {
                 
@@ -285,6 +301,8 @@
                         desc: 'Source File: ' + downSelect.selectFileName + ' <br>Bucket: ' + downSelect.selectBucketName + ' <br>Target: ' + filepath,
                         duration: 0
                     }
+
+                    store.commit('updateFileDownloadFlag', true)
                     STROJ_CLIENT.downloadFile(downSelect.selectBucketId, downSelect.selectFileId,
                         filepath, bridgeUser, bridgePass, function(err) {
                             downloadNoticeArgs['title'] = 'File Download Error'
@@ -299,6 +317,8 @@
                                 filepath : filepath,
                                 bucketName: downSelect.selectBucketName
                             })
+
+                            FILEINDEX_JS.saveDownloadFile(downSelect.selectBucketId, downSelect.selectFileId, function() {})
                         }, function(progress, downloadedBytes, totalBytes) {
 
                         }
