@@ -75,7 +75,7 @@
                     <div slot="footer">
                         <input id="fileDialog" type="file" nwsaveas hidden/>
                         <Button v-if="!fileDownloadFlag" type="primary" size="large"  @click="downloadFile">Download</Button>
-                        <Button v-if="!fileDownloadFlag" type="error" size="large"  @click="deleteFile">Delete</Button>
+                        <Button type="error" size="large"  @click="show_del_file_modal = true">Delete</Button>
                     </div>
                 </Modal>
 
@@ -94,6 +94,35 @@
                     <div slot="footer">
                         <Button type="primary" size="large"  @click="show_del_bucket_modal = false">Cancel</Button>
                         <Button type="error" size="large"  @click="deleteBucket">Delete</Button>
+                    </div>
+                </Modal>
+
+                <!-- 删除File确认框 -->
+                <Modal v-model="show_del_file_modal" :closable="false">
+                    <div style="height:40px; margin-top: 5px; margin-bottom:10px;">
+                        <Row>
+                            <h3>Confirm Delete File?</h3>
+                        </Row>
+                        <Row>
+                            <Col span="8">
+                                <h4>BucketName:</h4>
+                            </Col>
+                            <Col span="16">
+                                {{ selected.selectBucketName }}
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col span="8">
+                                <h4>FileName:</h4>
+                            </Col>
+                            <Col span="16">
+                                {{ selected.selectFileName }}
+                            </Col>
+                        </Row>
+                    </div>
+                    <div slot="footer">
+                        <Button type="primary" size="large"  @click="show_del_file_modal = false">Cancel</Button>
+                        <Button type="error" size="large"  @click="deleteFile">Delete</Button>
                     </div>
                 </Modal>
             </template>
@@ -116,6 +145,7 @@
                 show_buckets_modal: false,
                 show_receipt_modal: false,
                 show_del_bucket_modal: false,
+                show_del_file_modal: false,
                 addBucketItem: {
                     bucketName: ''
                 },
@@ -173,6 +203,13 @@
                                 },
                                 style: {
                                     marginRight: '3px'
+                                },
+                                on: {
+                                    click:() => {
+                                        this.selected.selectFileName = params.row.filename
+                                        this.selected.selectFileId = params.row.id
+                                        this.show_del_file_modal = true
+                                    }
                                 }
                             }, 'Delete')
                         ])
@@ -224,53 +261,52 @@
             addBucketOk() {
                 if (this.addBucketItem.bucketName != '') {
                     var bucketName = this.addBucketItem.bucketName
-                    var user_name = this.username
-                    var pass_word = this.password
+                    var bridgeUser = this.username
+                    var bridgePass = this.password
 
                     iView.Message.info('Add Bucket Waiting');
 
                     // 调用创建Bucket Api
-                    STROJ_CLIENT.createBucket(bucketName, user_name, pass_word,
+                    STROJ_CLIENT.createBucket(bucketName, bridgeUser, bridgePass,
                         function(err) {
-                            iView.Notice.error({
-                                title: '<b>Create Bucket Error</b>',
-                                desc: 'Bucket Name: ' + bucketName + '<br>Error:' + err,
-                                duration: 0
-                            });
+                            // 显示错误Notice
+                            var noticeArgs = {
+                                title: 'Create Bucket Error',
+                                desc: 'Bucket Name: ' + bucketName,
+                                err: err,
+                                duration: 5
+                            }
+                            IVIEW_UTIL.showErrNotice(noticeArgs)
                         }, function(result) {
                             iView.Message.info('Add Bucket Success');
 
                             // 添加完成后 刷新Bucket列表
-                            FILEINDEX_JS.initBucketList(user_name, pass_word)
+                            FILEINDEX_JS.initBucketList(bridgeUser, bridgePass)
                         }
                     )
-                    this.addBucketItem.bucketName=''
+                    this.addBucketItem.bucketName = ''
                 }
             },
+            // 添加Bucket 取消按钮事件
             addBucketCancel() {
                 this.addBucketItem.bucketName=''
             },
+            // Bucket按钮单击事件
             bucketBtnClick(bucket) {
                 this.selected.selectBucketName = bucket.label
                 this.selected.selectBucketId = bucket.value
 
                 // 获取文件列表
-                store.commit('updateFileListLoading', true)
-                STROJ_CLIENT.getFileList(bucket.value, this.username, this.password, function(err) {
-                    iView.Message.error('Get Bucket File List Error:' + err);
-                    store.commit('updateFileListLoading', false)
-                }, function(result) {
-                    store.commit('updateBucketFileList', result)
-                    store.commit('updateFileListLoading', false)
-                })
+                FILEINDEX_JS.initFileList(this.username, this.password, bucket.value)
             },
+            // 显示文件Receipt模态框事件
             showReceipt(filename, fileId) {
                 this.selected.selectFileName = filename
                 this.selected.selectFileId = fileId
                 this.show_receipt_modal = true
-                QR_CODE.createQrCodeStr(fileId, function(error) {
 
-                }, function(result) {
+                // 生成文件二维码
+                QR_CODE.createQrCodeStr(fileId, function(error) {}, function(result) {
                     store.commit('updateFileQrCode', result)
                 })
 
@@ -282,62 +318,76 @@
                         store.commit('updateFileDownloadFlag', false)
                 })
             },
+            // 文件删除操作
             deleteFile() {
-                
+                FILEINDEX_JS.deleteFile(this.username, this.password, 
+                    this.selected.selectBucketId, this.selected.selectFileId)
+                this.show_del_file_modal = false
+                this.show_receipt_modal = false
             },
+            // 文件下载
             downloadFile() {
+                // 弹出保存对话框配置
                 var options = {
                     title: 'Save File',
                     defaultPath: './' + this.selected.selectFileName
                 }
                 var downSelect = this.selected
                 var bridgeUser = this.username
-                var bridgePass = this.password
+                var bridgePass = this.password                
+                // 校验文件是否已经下载
+                FILEINDEX_JS.checkFileDownload(this.selected.selectBucketId, this.selected.selectFileId, function(result) {
+                    if(result.length == 0) {
+                        // 显示保存对话框
+                        ELECTRON_DIALOG.showSaveDialog(options, function(filepath) {
+                            iView.Message.info('File Downloading...');
+                            var downloadNoticeArgs = {
+                                desc: 'Source File: ' + downSelect.selectFileName + ' <br>Bucket: ' + downSelect.selectBucketName + ' <br>Target: ' + filepath,
+                                duration: 5
+                            }
 
-                ELECTRON_DIALOG.showSaveDialog(options, function(filepath) {
-                    iView.Message.info('File Downloading...');
+                            // 修改文件下载状态 = true
+                            store.commit('updateFileDownloadFlag', true)
+                            STROJ_CLIENT.downloadFile(downSelect.selectBucketId, downSelect.selectFileId,
+                                filepath, bridgeUser, bridgePass, function(err) {
+                                    downloadNoticeArgs['title'] = 'File Download Error'
+                                    downloadNoticeArgs['err'] = err
+                                    IVIEW_UTIL.showErrNotice(downloadNoticeArgs)
+                                }, function() {
+                                    downloadNoticeArgs['title'] = 'File Download Success'
+                                    IVIEW_UTIL.showSuccessNotice(downloadNoticeArgs)
+                                    
+                                    // 更新文件下载列表
+                                    store.commit('updateDownloadFileList', {
+                                        filename: downSelect.selectFileName,
+                                        filepath : filepath,
+                                        bucketName: downSelect.selectBucketName
+                                    })
 
-                    var downloadNoticeArgs = {
-                        desc: 'Source File: ' + downSelect.selectFileName + ' <br>Bucket: ' + downSelect.selectBucketName + ' <br>Target: ' + filepath,
-                        duration: 0
+                                    // 保存文件记录
+                                    FILEINDEX_JS.saveDownloadFile(downSelect.selectBucketId, downSelect.selectFileId, function() {})
+                                }, function(progress, downloadedBytes, totalBytes) {}
+                            )
+                        })
+                    } else {
+                        IVIEW_UTIL.showWarnAlert('File Already Download')
                     }
-
-                    store.commit('updateFileDownloadFlag', true)
-                    STROJ_CLIENT.downloadFile(downSelect.selectBucketId, downSelect.selectFileId,
-                        filepath, bridgeUser, bridgePass, function(err) {
-                            downloadNoticeArgs['title'] = 'File Download Error'
-                            downloadNoticeArgs['err'] = err
-                            IVIEW_UTIL.showErrNotice(downloadNoticeArgs)
-                        }, function() {
-                            downloadNoticeArgs['title'] = 'File Download Success'
-                            IVIEW_UTIL.showSuccessNotice(downloadNoticeArgs)
-
-                            store.commit('updateDownloadFileList', {
-                                filename: downSelect.selectFileName,
-                                filepath : filepath,
-                                bucketName: downSelect.selectBucketName
-                            })
-
-                            FILEINDEX_JS.saveDownloadFile(downSelect.selectBucketId, downSelect.selectFileId, function() {})
-                        }, function(progress, downloadedBytes, totalBytes) {
-
-                        }
-                    )
                 })
             },
+            // Bucket Action的操作
             bucketAction(name) {
                 if (name === 'delete') {
                     this.show_del_bucket_modal = true
                 }
             },
+            // Bucket 删除操作
             deleteBucket() {
                 var bridgeUser = this.username
                 var bridgePass = this.password
 
                 STROJ_CLIENT.deleteBucket(this.selected.selectBucketId, bridgeUser, bridgePass, 
-                        function(err) {
-
-                        }, function(result) {
+                        function(err) {}, 
+                        function(result) {
                             // 页面初始化,获取bucketList
                             iView.Message.info('Bucket Delete Success');
                             FILEINDEX_JS.initBucketList(bridgeUser, bridgePass)
@@ -345,6 +395,7 @@
                 )
 
                 this.selected.selectBucketId = ''
+                this.show_del_bucket_modal = false
             }
         }
     }

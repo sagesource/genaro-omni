@@ -97,6 +97,19 @@ function downloadFile(bucketId, fileId, downloadFilePath, bridgeUser, bridgePass
     })
 }
 
+/* 删除文件 */
+function deleteFile(bucketId, fileId, bridgeUser, bridgePass, errorCallback, successCallback) {
+    var _storj = getStorj(bridgeUser, bridgePass);
+    _storj.deleteFile(bucketId, fileId, function (err,result) {
+        if (err) {
+            errorCallback(err)
+            console.error(err);
+        } else {
+            successCallback(result)
+        }
+    })
+}
+
 /* 获取Storj连接 */
 function getStorj(bridgeUser, bridgePass) {
     var _storj = new Environment({
@@ -116,6 +129,7 @@ export default {
     deleteBucket,
     uploadFile,
     getFileList,
-    downloadFile
+    downloadFile,
+    deleteFile
 }
 </script>

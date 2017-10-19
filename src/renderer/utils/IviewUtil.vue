@@ -19,8 +19,17 @@ function showSuccessNotice(noticeArgs) {
     });
 }
 
+/* 显示警告alert */
+function showWarnAlert(content) {
+    iView.Modal.warning({
+        title: 'WARN',
+        content: content
+    });
+}
+
 export default {
     showErrNotice,
-    showSuccessNotice
+    showSuccessNotice,
+    showWarnAlert
 }
 </script>
