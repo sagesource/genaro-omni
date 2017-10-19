@@ -149,6 +149,7 @@
                 } else {
                     var uploadBucketName = this.bucketName;
 
+                    iView.Message.info('File Uploading...');
                     STROJ_CLIENT.uploadFile(file, this.bucketId, this.username, this.password, function(err) {
                         iView.Notice.error({
                             title: '<b>File Upload Error</b>',
