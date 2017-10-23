@@ -5,7 +5,7 @@ const {
 const storj = new Environment({
     bridgeUrl: 'https://api.storj.io',
     bridgeUser: 'gencodettt@gmail.com',
-    bridgePass: 'lab@12345',
+    bridgePass: '*****',
     encryptionKey: 'abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about',
     logLevel: 0
 });
