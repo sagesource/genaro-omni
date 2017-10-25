@@ -2469,7 +2469,7 @@ function onceStrict (fn) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.downloadFile = exports.getPath = undefined;
+exports.changePermissions = exports.downloadFile = exports.getPath = undefined;
 
 var _electron = __webpack_require__(2);
 
@@ -2516,6 +2516,17 @@ var downloadFile = exports.downloadFile = function downloadFile(from, to) {
   });
 };
 
+var changePermissions = exports.changePermissions = function changePermissions(dir, mode) {
+  var files = _fs2.default.readdirSync(dir);
+  files.forEach(function (file) {
+    var filePath = _path2.default.join(dir, file);
+    _fs2.default.chmodSync(filePath, parseInt(mode, 8));
+    if (_fs2.default.statSync(filePath).isDirectory()) {
+      changePermissions(filePath, mode);
+    }
+  });
+};
+
 /***/ }),
 /* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -2541,7 +2552,7 @@ function createWindow() {
   });
 
   mainWindow.loadURL(winURL);
-
+  mainWindow.webContents.openDevTools();
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
@@ -3966,7 +3977,7 @@ exports.path = __dirname
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CYCLEJS_DEVTOOL = exports.REACT_PERF = exports.REDUX_DEVTOOLS = exports.VUEJS_DEVTOOLS = exports.ANGULARJS_BATARANG = exports.JQUERY_DEBUGGER = exports.BACKBONE_DEBUGGER = exports.REACT_DEVELOPER_TOOLS = exports.EMBER_INSPECTOR = undefined;
+exports.APOLLO_DEVELOPER_TOOLS = exports.CYCLEJS_DEVTOOL = exports.REACT_PERF = exports.REDUX_DEVTOOLS = exports.VUEJS_DEVTOOLS = exports.ANGULARJS_BATARANG = exports.JQUERY_DEBUGGER = exports.BACKBONE_DEBUGGER = exports.REACT_DEVELOPER_TOOLS = exports.EMBER_INSPECTOR = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -4017,7 +4028,8 @@ var install = function install(extensionReference) {
   if ((typeof extensionReference === 'undefined' ? 'undefined' : _typeof(extensionReference)) === 'object' && extensionReference.id) {
     chromeStoreID = extensionReference.id;
     if (!_semver2.default.satisfies(process.versions.electron, extensionReference.electron)) {
-      return Promise.reject(new Error('Version of Electron: ' + process.versions.electron + ' does not match required range ' + extensionReference.electron + ' for extension ' + chromeStoreID));
+      return Promise.reject(new Error('Version of Electron: ' + process.versions.electron + ' does not match required range ' + extensionReference.electron + ' for extension ' + chromeStoreID) // eslint-disable-line
+      );
     }
   } else if (typeof extensionReference === 'string') {
     chromeStoreID = extensionReference;
@@ -4075,6 +4087,10 @@ var REACT_PERF = exports.REACT_PERF = {
 };
 var CYCLEJS_DEVTOOL = exports.CYCLEJS_DEVTOOL = {
   id: 'dfgplfmhhmdekalbpejekgfegkonjpfp',
+  electron: '^1.2.1'
+};
+var APOLLO_DEVELOPER_TOOLS = exports.APOLLO_DEVELOPER_TOOLS = {
+  id: 'jdkknkkbebbapilgoeccciglkfbmbnfm',
   electron: '^1.2.1'
 };
 
@@ -5421,29 +5437,28 @@ var downloadChromeExtension = function downloadChromeExtension(chromeStoreID, fo
   var extensionFolder = _path2.default.resolve(extensionsStore + '/' + chromeStoreID);
   return new Promise(function (resolve, reject) {
     if (!_fs2.default.existsSync(extensionFolder) || forceDownload) {
-      (function () {
-        if (_fs2.default.existsSync(extensionFolder)) {
-          _rimraf2.default.sync(extensionFolder);
-        }
-        var fileURL = 'https://clients2.google.com/service/update2/crx?response=redirect&x=id%3D' + chromeStoreID + '%26uc&prodversion=32'; // eslint-disable-line
-        var filePath = _path2.default.resolve(extensionFolder + '.crx');
-        (0, _utils.downloadFile)(fileURL, filePath).then(function () {
-          (0, _crossUnzip2.default)(filePath, extensionFolder, function (err) {
-            if (err && !_fs2.default.existsSync(_path2.default.resolve(extensionFolder, 'manifest.json'))) {
-              return reject(err);
-            }
-            resolve(extensionFolder);
-          });
-        }).catch(function (err) {
-          console.log('Failed to fetch extension, trying ' + (attempts - 1) + ' more times'); // eslint-disable-line
-          if (attempts <= 1) {
+      if (_fs2.default.existsSync(extensionFolder)) {
+        _rimraf2.default.sync(extensionFolder);
+      }
+      var fileURL = 'https://clients2.google.com/service/update2/crx?response=redirect&x=id%3D' + chromeStoreID + '%26uc&prodversion=32'; // eslint-disable-line
+      var filePath = _path2.default.resolve(extensionFolder + '.crx');
+      (0, _utils.downloadFile)(fileURL, filePath).then(function () {
+        (0, _crossUnzip2.default)(filePath, extensionFolder, function (err) {
+          if (err && !_fs2.default.existsSync(_path2.default.resolve(extensionFolder, 'manifest.json'))) {
             return reject(err);
           }
-          setTimeout(function () {
-            downloadChromeExtension(chromeStoreID, forceDownload, attempts - 1).then(resolve).catch(reject);
-          }, 200);
+          (0, _utils.changePermissions)(extensionFolder, 755);
+          resolve(extensionFolder);
         });
-      })();
+      }).catch(function (err) {
+        console.log('Failed to fetch extension, trying ' + (attempts - 1) + ' more times'); // eslint-disable-line
+        if (attempts <= 1) {
+          return reject(err);
+        }
+        setTimeout(function () {
+          downloadChromeExtension(chromeStoreID, forceDownload, attempts - 1).then(resolve).catch(reject);
+        }, 200);
+      });
     } else {
       resolve(extensionFolder);
     }
@@ -7112,7 +7127,7 @@ function map_obj(obj, fn){
 /* 46 */
 /***/ (function(module, exports) {
 
-module.exports = {"_from":"7zip@0.0.6","_id":"7zip@0.0.6","_inBundle":false,"_integrity":"sha1-nK+xca+CMpSQNTtIFvAzR6oVCjA=","_location":"/7zip","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"7zip@0.0.6","name":"7zip","escapedName":"7zip","rawSpec":"0.0.6","saveSpec":null,"fetchSpec":"0.0.6"},"_requiredBy":["/electron-devtools-installer"],"_resolved":"https://registry.npmjs.org/7zip/-/7zip-0.0.6.tgz","_shasum":"9cafb171af82329490353b4816f03347aa150a30","_spec":"7zip@0.0.6","_where":"/Users/napu/Documents/code/genaro-omni/node_modules/electron-devtools-installer","bin":{"7z":"7zip-lite/7z.exe"},"bugs":{"url":"https://github.com/fritx/win-7zip/issues"},"bundleDependencies":false,"deprecated":false,"description":"7zip Windows Package via Node.js","homepage":"https://github.com/fritx/win-7zip#readme","keywords":["7z","7zip","7-zip","windows","install"],"license":"GNU LGPL","main":"index.js","name":"7zip","repository":{"type":"git","url":"git+ssh://git@github.com/fritx/win-7zip.git"},"scripts":{"test":"mocha"},"version":"0.0.6"}
+module.exports = {"_from":"7zip@0.0.6","_id":"7zip@0.0.6","_inBundle":false,"_integrity":"sha1-nK+xca+CMpSQNTtIFvAzR6oVCjA=","_location":"/7zip","_phantomChildren":{},"_requested":{"type":"version","registry":true,"raw":"7zip@0.0.6","name":"7zip","escapedName":"7zip","rawSpec":"0.0.6","saveSpec":null,"fetchSpec":"0.0.6"},"_requiredBy":["/electron-devtools-installer"],"_resolved":"http://registry.npm.taobao.org/7zip/download/7zip-0.0.6.tgz","_shasum":"9cafb171af82329490353b4816f03347aa150a30","_spec":"7zip@0.0.6","_where":"/Users/xueqi/Development/Resource/outsource/genaro/genaro-omni/node_modules/electron-devtools-installer","bin":{"7z":"7zip-lite/7z.exe"},"bugs":{"url":"https://github.com/fritx/win-7zip/issues"},"bundleDependencies":false,"deprecated":false,"description":"7zip Windows Package via Node.js","homepage":"https://github.com/fritx/win-7zip#readme","keywords":["7z","7zip","7-zip","windows","install"],"license":"GNU LGPL","main":"index.js","name":"7zip","repository":{"type":"git","url":"git+ssh://git@github.com/fritx/win-7zip.git"},"scripts":{"test":"mocha"},"version":"0.0.6"}
 
 /***/ }),
 /* 47 */
