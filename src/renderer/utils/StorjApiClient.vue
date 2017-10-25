@@ -3,7 +3,7 @@ import iView from 'iview';
 import store from '../store'
 
 const {Environment} = require('storj');
-const storjApiUrl = 'https://api.storj.io';
+const storjApiUrl = 'http://101.132.159.197:8080';
 
 /* 创建Bucket */
 function createBucket(bucketName, bridgeUser, bridgePass, errorCallback, successCallback) {

@@ -1,7 +1,10 @@
 <script type="text/javascript">
+const path = require('path')
+const os = require('os')
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
-const adapter = new FileSync('db.json')
+const dbPath = path.join(os.homedir(), "db.json")
+const adapter = new FileSync(dbPath)
 const db = low(adapter)
 
 db.defaults({ t_down_files: [] }).write()

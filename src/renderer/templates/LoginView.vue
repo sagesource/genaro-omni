@@ -54,30 +54,9 @@
         methods:{
             submitLogin() {
                 if(this.login.username.length != 0 && this.login.password.length != 0) { 
-                    this.$http.get('/static/users.json').then(response => {
-                        // success callback
-                        console.log('submit success resp:' + response)
-
-                        var index;
-                        for(index in response.data) {
-                            if(response.data[index].username === this.login.username) {
-                                if(response.data[index].password === this.login.password) {
-                                    this.$store.commit('updateUsername', this.login.username)
-                                    this.$store.commit('updatePassword', this.login.password)
-                                    this.$store.commit('updateBucketId', response.data[index].bucketId)
-
-                                    this.$router.push({ path: '/index'})
-                                } else {
-                                    alert('username or password error!')
-                                }
-                            } else {
-                                alert('username not exist!')
-                            }
-                        }
-                    }, response => {
-                        // error callback
-                        console.log('submit error resp:' + response)
-                    });
+                    this.$store.commit('updateUsername', this.login.username)
+                    this.$store.commit('updatePassword', this.login.password)
+                    this.$router.push({ path: '/index'})
                 }
             }
         }
