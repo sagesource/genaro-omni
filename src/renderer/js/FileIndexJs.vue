@@ -9,7 +9,8 @@ function initBucketList(username, password) {
     STROJ_CLIENT.getBucketList(username, password, function(err) {
             iView.Modal.error({
                 title : 'Obtain Bucket Error',
-                content: 'Obtain Bucket Error :' + err
+                content: 'Obtain Bucket Error :' + err,
+                okText: 'OK'
             });
         }, function(result) {
                 store.commit('updateBucketList', result)

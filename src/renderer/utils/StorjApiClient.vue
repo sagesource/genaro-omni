@@ -110,6 +110,20 @@ function deleteFile(bucketId, fileId, bridgeUser, bridgePass, errorCallback, suc
     })
 }
 
+/* 获取信息 */
+function getInfo(bridgeUser, bridgePass, errorCallback, successCallback) {
+    var _storj = getStorj(bridgeUser, bridgePass);
+    _storj.getInfo(function(err, result) {
+        if(err) {
+            errorCallback(err)
+            console.error(err);
+        } else {
+            successCallback(result)
+            console.error(result);
+        }
+    })
+}
+
 /* 获取Storj连接 */
 function getStorj(bridgeUser, bridgePass) {
     var _storj = new Environment({
@@ -130,6 +144,7 @@ export default {
     uploadFile,
     getFileList,
     downloadFile,
-    deleteFile
+    deleteFile,
+    getInfo
 }
 </script>

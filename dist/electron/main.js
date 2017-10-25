@@ -2552,7 +2552,7 @@ function createWindow() {
   });
 
   mainWindow.loadURL(winURL);
-  mainWindow.webContents.openDevTools();
+
   mainWindow.on('closed', function () {
     mainWindow = null;
   });
