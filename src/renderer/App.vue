@@ -6,7 +6,7 @@
 
 <script>
   export default {
-    name: 'genaro-omni'
+    name: 'Genaro-Eden'
   }
 </script>
 

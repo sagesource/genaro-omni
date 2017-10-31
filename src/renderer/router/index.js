@@ -30,6 +30,10 @@ export default new Router({
             {
               path: '/file-download',
               component: require('@/templates/Favourites/DownloadView').default
+            },
+            {
+              path: '/share-my-storage',
+              component: require('@/templates/Favourites/ShareMyStorage').default
             }
           ]
         }

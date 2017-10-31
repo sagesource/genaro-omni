@@ -15,6 +15,10 @@ npm run dev
 
 # build electron application for production
 npm run build
+# Mac OS
+npm run build:darwin
+
+npm run build:clean
 
 
 ```
