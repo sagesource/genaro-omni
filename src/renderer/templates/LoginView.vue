@@ -19,16 +19,18 @@
                 <div class='login_center'>
                     <FormItem>
                         <Button type="primary" @click="submitLogin()">Sign In</Button>
-                        <Button type="ghost" style="margin-left: 8px">Sign Up</Button>
+                        <Button type="ghost" @click="submitSignup()" style="margin-left: 8px">Sign Up</Button>
                     </FormItem>
                 </div>
-                <a id="a_forget">Redister Now!</a>
+                <!-- <a id="a_forget">Redister Now!</a> -->
             </Form>
         </Card>
     </div>
 </template>
 
 <script> 
+    import iView from 'iview'
+
     export default {
         name : 'login-view',
         created: function () {
@@ -58,6 +60,13 @@
                     this.$store.commit('updatePassword', this.login.password)
                     this.$router.push({ path: '/index'})
                 }
+            },
+            submitSignup() {
+                iView.Modal.info({
+                    title : 'Genaro Eden',
+                    content: 'Genaro Eden is not open to public sign up now, please apply Genaro Eden account',
+                    okText: 'OK'
+                });
             }
         }
     }

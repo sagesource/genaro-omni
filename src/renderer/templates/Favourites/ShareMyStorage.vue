@@ -7,8 +7,8 @@
     }
 </style>
 <template>
-    <div id="wrap">
-        <span><img id="share-chart-img" src="~@/assets/share_chart_img.png" title="Note: This feature is not available for Genaro Eden Beta"></span>
+    <div>
+        <img id="share-chart-img" src="~@/assets/share_chart_img.png" title="Note: This feature is not available for Genaro Eden Beta">
         <h4 id="share-note">Note: This feature is not available for Genaro Eden Beta</h4>
     </div>
 </template>
