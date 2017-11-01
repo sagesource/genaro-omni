@@ -1,8 +1,17 @@
 # genaro-omni
 
-> An electron-vue project
+> An electron-vue uploader, downloader, and dashboard for the Genaro network
 
-#### Build Setup
+## Roadmap
+
+### v1.0 release goals
+- [x] User management 
+- [x] List buckets
+- [x] List files in bucket
+- [x] Drag and drop file upload
+- [x] File download
+
+## Build Setup
 
 ``` bash
 # install dependencies
