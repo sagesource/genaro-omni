@@ -24,20 +24,22 @@ npm run dev
 
 # build electron application for production
 npm run build
+
 # Mac OS
 npm run build:darwin
 
 npm run build:clean
 
 
+## Reference
 ```
 ---
 
-https://simulatedgreg.gitbooks.io/electron-vue/content/cn/
-https://wizardforcel.gitbooks.io/electron-doc/content/api/dialog.html
-https://www.iviewui.com/components/dropdown
-https://cn.vuejs.org/v2/guide/events.html
-https://www.npmjs.com/package/lowdb
+*   https://simulatedgreg.gitbooks.io/electron-vue/content/cn/
+*   https://wizardforcel.gitbooks.io/electron-doc/content/api/dialog.html
+*   https://www.iviewui.com/components/dropdown
+*   https://cn.vuejs.org/v2/guide/events.html
+*   https://www.npmjs.com/package/lowdb
 
 ---
 
