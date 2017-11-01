@@ -13,7 +13,7 @@
         height:200px;
     }
     .ivu-menu-item {
-        padding: 14px 40px;
+        padding-top: 14px 40px;
     }
 </style>
 

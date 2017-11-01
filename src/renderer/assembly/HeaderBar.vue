@@ -20,14 +20,14 @@
             <Col span="2">
                 <div class="demo-avatar-badge">
                     <Badge count="1">
-                        <Avatar shape="circle" src="https://i.loli.net/2017/08/21/599a521472424.jpg" size="large" />
+                        <img shape="circle" src="~@/assets/genaro_logo.png" size="large" >
                     </Badge>
-                    <Dropdown trigger="click" transfer placement="left-start" style="margin-left: 20px">
+                    <Dropdown trigger="click" @on-click="bucketAction" transfer placement="left-start" style="margin-left: 20px">
                         <a href="javascript:void(0)">
                             <Icon type="arrow-down-b"></Icon>
                         </a>
                         <DropdownMenu slot="list">
-                            <DropdownItem>null</DropdownItem>
+                            <DropdownItem name="logout">logout</DropdownItem>
                         </DropdownMenu>
                     </Dropdown>
                 </div>
@@ -37,6 +37,14 @@
 </template>
 
 <script>
+    import router from '../router'
     export default {
+        methods: {
+            bucketAction(name) {
+                if (name === 'logout') {
+                    router.push({path: '/'})
+                }
+            }
+        }
     }
 </script>

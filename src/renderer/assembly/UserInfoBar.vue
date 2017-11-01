@@ -23,7 +23,7 @@
             <Row type="flex">
                 <Col span="1">
                     <div class="layout-user-avater">
-                        <Avatar shape="square" icon="person" size="large" src="https://i.loli.net/2017/08/21/599a521472424.jpg"/>
+                        <img shape="circle" src="~@/assets/genaro_logo.png" size="large" >
                     </div>
                 </Col>
                 <Col span="23">
