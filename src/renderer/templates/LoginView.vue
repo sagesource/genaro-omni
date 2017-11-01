@@ -29,6 +29,9 @@
 </template>
 
 <script> 
+    import STROJ_CLIENT from '../utils/StorjApiClient'
+    import router from '../router'
+    import store from '../store'
     import iView from 'iview'
 
     export default {
@@ -48,17 +51,30 @@
                     ],
                     password: [
                         { required: true, message: 'please input password', trigger: 'blur' },
-                        { type: 'string', min: 6, message: '密码长度不能小于6位', trigger: 'blur' }
-                    ]
+                        { type: 'string', min: 6, message: 'Password length must not be less than 6 bits', trigger: 'blur' }                    ]
                 }
             }
         },
         methods:{
             submitLogin() {
                 if(this.login.username.length != 0 && this.login.password.length != 0) { 
-                    this.$store.commit('updateUsername', this.login.username)
-                    this.$store.commit('updatePassword', this.login.password)
-                    this.$router.push({ path: '/index'})
+                    this.$Spin.show();
+                    var bridgeUser = this.login.username
+                    var bridgePass = this.login.password
+                    STROJ_CLIENT.getBucketList(bridgeUser, bridgePass, function(err) {
+                        iView.Spin.hide()
+                        iView.Modal.error({
+                            title : 'Login Error',
+                            content: 'Username Or Password Error',
+                            okText: 'OK'
+                        });
+                    }, function(result) {
+                        iView.Spin.hide()
+                        store.commit('updateUsername', bridgeUser)
+                        store.commit('updatePassword', bridgePass)
+                        router.push({ path: '/index'})
+                    });
+
                 }
             },
             submitSignup() {
