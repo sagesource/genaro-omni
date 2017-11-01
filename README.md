@@ -15,6 +15,7 @@
 
 ``` bash
 # install dependencies
+
 npm install
 # Every time you run "npm install", run this:
 ./node_modules/.bin/electron-rebuild
@@ -30,9 +31,9 @@ npm run build:darwin
 
 npm run build:clean
 
+```
 
 ## Reference
-```
 ---
 
 *   https://simulatedgreg.gitbooks.io/electron-vue/content/cn/
