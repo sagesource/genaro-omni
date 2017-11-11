@@ -51,7 +51,7 @@
                     ok-text="OK" cancel-text="Cancel" :closable="false">
                     <Form :model="addBucketItem" :label-width="100">
                         <FormItem label="Bucket Name">
-                            <Input v-model="addBucketItem.bucketName" placeholder="Input Bucket Name"></Input>
+                            <Input v-model="addBucketItem.bucketName" placeholder="Input Bucket Name" @on-enter="addBucketOk"></Input>
                         </FormItem>
                     </Form>
                 </Modal>
@@ -264,7 +264,7 @@
                     var bridgeUser = this.username
                     var bridgePass = this.password
 
-                    iView.Message.info('Add Bucket Waiting');
+                    // iView.Message.info('Add Bucket Waiting');
 
                     // 调用创建Bucket Api
                     STROJ_CLIENT.createBucket(bucketName, bridgeUser, bridgePass,
@@ -285,6 +285,7 @@
                         }
                     )
                     this.addBucketItem.bucketName = ''
+                    this.add_bucket_modal=false
                 }
             },
             // 添加Bucket 取消按钮事件
