@@ -53,11 +53,15 @@
                     v-model="add_bucket_modal" title="Add Bucket" 
                     @on-ok="addBucketOk" @on-cancel="addBucketCancel"
                     ok-text="OK" cancel-text="Cancel" :closable="false">
-                    <Form :model="addBucketItem" :label-width="100">
+                    <!-- <Form :model="addBucketItem" :label-width="100">
                         <FormItem label="Bucket Name">
-                            <Input v-model="addBucketItem.bucketName" placeholder="Input Bucket Name" @on-enter="addBucketOk"></Input>
+                            <Input v-model="addBucketItem.bucketName" placeholder="Input Bucket Name" v-on:on-enter="addBucketOk"></Input>
                         </FormItem>
-                    </Form>
+                    </Form> -->
+                    <Row>
+                            <Col span="5"><h4>Bucket Name:</h4></Col>
+                            <Col span="19"><Input v-model="addBucketItem.bucketName" placeholder="Input Bucket Name" v-on:on-enter="addBucketOk"></Input></Col>
+                        </Row>
                 </Modal>
 
                 <!-- 显示receipt的modal -->
